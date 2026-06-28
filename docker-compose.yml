@@ -1,0 +1,48 @@
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: dotnet10-mssql
+    hostname: dotnet10-mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=D3vDotnet10
+    ports:
+      - "1433:1433"
+    networks:
+      - dotnet10-network
+
+  app:
+    build:
+      context: ./docker/app
+      dockerfile: Dockerfile.dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        USERNAME: ${USERNAME:-developer}
+    container_name: dotnet10-app
+    hostname: dotnet10-app
+    tty: true
+    stdin_open: true
+    # SÉCURITÉ : Permet au LSP (csharp-ls) d'exécuter tous ses appels système
+    security_opt:
+      - seccomp:unconfined
+    # ALTERNATIVE (si security_opt ne suffit pas) : privileged: true
+    volumes:
+      - ./sources/app:/home/${USERNAME:-developer}/app
+    user: "${USERNAME:-developer}"
+    working_dir: "/home/${USERNAME:-developer}/app"
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      - DOTNET_WATCH_RESTART_ON_RUDE_EDIT=1
+    depends_on:
+      - database
+    networks:
+      - dotnet10-network
+
+networks:
+  dotnet10-network:
+    name: dotnet10-network-${ENVIRONMENT}
+    driver: bridge

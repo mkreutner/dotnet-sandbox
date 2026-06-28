@@ -1,0 +1,66 @@
+﻿// File: Program.cs
+using System;
+using System.Linq;
+
+// Instantiate our database context
+using var context = new AppDbContext();
+
+Console.WriteLine("--- .NET 10 Entity Framework Core Lab ---");
+
+// 1. Ensure the database is created (safety check)
+context.Database.EnsureCreated();
+
+// 2. Insert data if the database is completely empty
+if (!context.Guests.Any())
+{
+    Console.WriteLine("Database is empty. Seeding initial data...");
+    
+    context.Guests.AddRange(
+        new Guest("Alice", 28),
+        new Guest("Bob", 34),
+        new Guest("Charlie", 22),
+        new Guest("David", 19)
+    );
+
+    // Crucial step: Save changes to the actual SQL database
+    context.SaveChanges();
+    Console.WriteLine("Data successfully seeded!");
+}
+
+// 3. Read data from SQL Server using LINQ
+Console.WriteLine("\n--- Fetching all guests from SQL Server ---");
+var allGuests = context.Guests.ToList();
+foreach (var guest in allGuests)
+{
+    guest.DisplayInfo();
+}
+
+// 4. Combined Power: EF Core + LINQ filtering (executed on SQL Server side!)
+Console.WriteLine("\n--- LINQ + EF Core: Guests older than 25 ---");
+var filteredGuests = context.Guests.Where(g => g.Age > 25).ToList();
+foreach (var guest in filteredGuests)
+{
+    guest.DisplayInfo();
+}
+
+// 5. Add a new guest dynamically from user input
+Console.WriteLine("\nAdd a new guest to the SQL Database:");
+Console.Write("Enter name: ");
+string? nameInput = Console.ReadLine();
+
+Console.Write("Enter age: ");
+string? ageInput = Console.ReadLine();
+
+if (!string.IsNullOrWhiteSpace(nameInput) && int.TryParse(ageInput, out int age))
+{
+    Guest newGuest = new Guest(nameInput, age);
+    
+    // Track the new object
+    context.Guests.Add(newGuest);
+    
+    // Commit to the database
+    context.SaveChanges();
+    
+    Console.WriteLine($"Successfully saved {nameInput} to MS SQL Server!");
+}
+
