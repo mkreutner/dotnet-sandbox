@@ -11,7 +11,14 @@ builder.Services.AddDbContext<TodoDbContext>();
 // Register our TodoService into the Dependency Injection container
 builder.Services.AddScoped<ITodoService, TodoService>();
 
+// Register our global handler
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails(); // Optional but recommended in .NET 10 to standardize errors
+
 var app = builder.Build();
+
+// Enables the exception middleware at the very beginning of the pipeline!
+app.UseExceptionHandler();
 
 // Ensure the database exists and contains tables
 using (var scope = app.Services.CreateScope())
@@ -32,38 +39,21 @@ app.MapGet("/api/todo", async (ITodoService todoService) =>
 // ROUTE 2: POST a new todo item into MS SQL Server
 app.MapPost("/api/todo", async (TodoItem todoItem, ITodoService todoService) =>
 {
-  try
-  {
-    var createdItem = await todoService.AddTodoAsync(todoItem);
-    return Results.Created($"/api/todo/{createdItem.Id}", createdItem);
-  }
-  catch (ArgumentException ex)
-  {
-    return Results.BadRequest(new { Error = ex.Message });
-  }
-  catch (Exception ex)
-  {
-    return Results.InternalServerError(new { Error = "An unexpected error occurred." });
-  }
+  // If AddTodoAsync throws an ArgumentException, the middleware catches it and returns a 400
+  var createdItem = await todoService.AddTodoAsync(todoItem); 
+  
+  return Results.Created($"/api/todo/{createdItem.Id}", createdItem);
 });
 
 
 // ROUTE 3: PUT completed item
 app.MapPut("/api/todo/{id}/complete", async (int id, ITodoService todoService) =>
 {
-    try 
-    {
-      await todoService.CompleteTodoAsync(id);
-      return Results.Ok(new { Message = $"Todo {id} marked as completed." });
-    }
-    catch (KeyNotFoundException ex)
-    {
-      return Results.NotFound(new { Error = $"Todo {id} not found." });
-    }
-    catch (Exception ex)
-    {
-      return Results.InternalServerError(new { Error = "An unexpected error occured." });
-    }
+  // If the ID does not exist, CompleteTodoAsync throws a KeyNotFoundException. 
+  // The middleware catches it immediately and returns a 404! 
+  await todoService.CompleteTodoAsync(id); 
+
+  return Results.Ok(new { Message = $"Todo {id} marked as completed." });
 });
 
 // Start the API on port 5000, accessible from outside the container
