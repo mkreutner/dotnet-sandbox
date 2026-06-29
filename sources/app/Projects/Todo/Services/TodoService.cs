@@ -1,20 +1,16 @@
 // File: Services/TodoService.cs
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 using Todo.DTOs;
 
 public class TodoService : ITodoService
 {
   private readonly TodoDbContext _context;
-  private readonly IMapper _mapper;
 
   // Le constructeur reçoit le contexte de la DB automatiquement !
   public TodoService(
-      TodoDbContext context,
-      IMapper mapper
+      TodoDbContext context
   ) {
     _context = context;
-    _mapper = mapper;
   }
  
   // Retrieve all Todo Items
@@ -39,13 +35,13 @@ public class TodoService : ITodoService
     }
 
     // Transform dto to TodoItem entity.
-    var item = _mapper.Map<TodoItem>(dto);
+    var item = dto.ToEntity();
 
     await _context.TodoItems.AddAsync(item);
     await _context.SaveChangesAsync();
     
     // Transform item created to TodoResponseDto
-    var createdDto = _mapper.Map<TodoResponseDto>(item);
+    var createdDto = item.ToResponseDto();
 
     return createdDto; 
   }

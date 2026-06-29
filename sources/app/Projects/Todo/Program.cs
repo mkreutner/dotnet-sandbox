@@ -12,8 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TodoDbContext>();
 // Register our TodoService into the Dependency Injection container
 builder.Services.AddScoped<ITodoService, TodoService>();
-// Register AutoMapper into the Dependency Injection container
-builder.Services.AddAutoMapper(typeof(TodoProfile));
 
 // Register our global handler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
