@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+using Todo.DTOs;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Register our TodoDbContext into the Dependency Injection container
@@ -37,12 +39,12 @@ app.MapGet("/api/todo", async (ITodoService todoService) =>
 });
 
 // ROUTE 2: POST a new todo item into MS SQL Server
-app.MapPost("/api/todo", async (TodoItem todoItem, ITodoService todoService) =>
+app.MapPost("/api/todo", async (TodoCreateDto dto, ITodoService todoService) =>
 {
   // If AddTodoAsync throws an ArgumentException, the middleware catches it and returns a 400
-  var createdItem = await todoService.AddTodoAsync(todoItem); 
+  var responseDto = await todoService.AddTodoAsync(dto); 
   
-  return Results.Created($"/api/todo/{createdItem.Id}", createdItem);
+  return Results.Created($"/api/todo/{responseDto.Id}", responseDto);
 });
 
 

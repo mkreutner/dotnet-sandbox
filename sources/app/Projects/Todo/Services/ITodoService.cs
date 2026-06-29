@@ -1,3 +1,5 @@
+using Todo.DTOs;
+
 // File: Services/ITodoService.cs
 public interface ITodoService
 {
@@ -5,7 +7,7 @@ public interface ITodoService
     Task<List<TodoItem>> GetAllTodoAsync();
 
     // Add a new todo item
-    Task<TodoItem> AddTodoAsync(TodoItem item);
+    Task<TodoResponseDto> AddTodoAsync(TodoCreateDto dto);
 
     // Change todo item status
     Task<bool> CompleteTodoAsync(int id);
