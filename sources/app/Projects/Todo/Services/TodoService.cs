@@ -1,16 +1,20 @@
 // File: Services/TodoService.cs
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Todo.DTOs;
 
 public class TodoService : ITodoService
 {
   private readonly TodoDbContext _context;
+  private readonly IValidator<TodoCreateDto> _validator;
 
   // Le constructeur reçoit le contexte de la DB automatiquement !
   public TodoService(
-      TodoDbContext context
+      TodoDbContext context,
+      IValidator<TodoCreateDto> validator
   ) {
     _context = context;
+    _validator = validator;
   }
  
   // Retrieve all Todo Items
@@ -22,16 +26,13 @@ public class TodoService : ITodoService
   // Add a new todo item
   public async Task<TodoResponseDto> AddTodoAsync(TodoCreateDto dto) 
   {
-    // The title cannot be empty
-    if (string.IsNullOrWhiteSpace(dto.Title))
-    {
-      throw new ArgumentException("Todo item title cannot be empty.");
-    }
+    // The title validation
+    var validationResult = await _validator.ValidateAsync(dto);
 
-    // The title must be a maximum of 100 characters long.
-    if (dto.Title.Length > 100)
+    // DTO is not valid
+    if (!validationResult.IsValid)
     {
-      throw new ArgumentOutOfRangeException("Todo item title must be a maximum of 100 characters long.");
+      throw new FluentValidation.ValidationException(validationResult.Errors);
     }
 
     // Transform dto to TodoItem entity.
