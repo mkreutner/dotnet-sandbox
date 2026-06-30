@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using FluentValidation;
 
 using Todo.DTOs;
 
@@ -16,6 +17,7 @@ builder.Services.AddScoped<ITodoService, TodoService>();
 // Register our global handler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails(); // Optional but recommended in .NET 10 to standardize errors
+builder.Services.AddValidatorsFromAssemblyContaining<TodoCreateDtoValidator>();
 
 var app = builder.Build();
 
