@@ -2,6 +2,8 @@
 using FluentValidation;
 using Todo.DTOs;
 
+namespace Todo.Validators;
+
 public class TodoCreateDtoValidator : AbstractValidator<TodoCreateDto>
 {
     public TodoCreateDtoValidator()

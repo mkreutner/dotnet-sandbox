@@ -1,4 +1,6 @@
 // File: TodoItem.cs
+namespace Todo.Models;
+
 public class TodoItem
 {
     // EF Core will automatically recognize this property as the Primary Key

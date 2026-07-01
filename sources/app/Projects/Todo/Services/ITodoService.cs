@@ -1,14 +1,13 @@
 using Todo.DTOs;
 
-// File: Services/ITodoService.cs
+namespace Todo.Services;
+
 public interface ITodoService
 {
-    // Retrieve all Todo Items
-    Task<List<TodoItem>> GetAllTodoAsync();
-
-    // Add a new todo item
-    Task<TodoResponseDto> AddTodoAsync(TodoCreateDto dto);
-
-    // Change todo item status
-    Task<bool> CompleteTodoAsync(int id);
+    Task<TodoResponseDto> CreateAsync(TodoCreateDto dto);
+    Task<IEnumerable<TodoResponseDto>> GetAllAsync();
+    Task<TodoResponseDto> GetByIdAsync(int id);
+    Task<TodoResponseDto> UpdateAsync(int id, TodoUpdateDto dto);
+    Task DeleteAsync(int id);
 }
+

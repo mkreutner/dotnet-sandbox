@@ -1,26 +1,36 @@
-// File: Projects/Todo/DTOs/TodoMappingExtensions.cs
-using Todo.DTOs;
+using Todo.Models;
+
+namespace Todo.DTOs;
 
 public static class TodoMappingExtensions
 {
-    // Convertit un TodoCreateDto en entité TodoItem (pour l'insertion)
+    // Convert TodoCreateDto int TodoItem (for INSERT)
     public static TodoItem ToEntity(this TodoCreateDto dto)
     {
         return new TodoItem
         {
             Title = dto.Title,
-            IsCompleted = false // Valeur par défaut à la création
+            IsCompleted = false // default value 
         };
     }
 
-    // Convertit une entité TodoItem en TodoResponseDto (pour la sortie API)
+    // Convert TodoItem into TodoResponseDto using record constructor
     public static TodoResponseDto ToResponseDto(this TodoItem item)
     {
-        return new TodoResponseDto
-        {
-            Id = item.Id,
-            Title = item.Title,
-            IsCompleted = item.IsCompleted
-        };
+        // Use directly record constructor arguments
+        return new TodoResponseDto(item.Id, item.Title, item.IsCompleted);
+    }
+    
+    // Used by GET All
+    public static IEnumerable<TodoResponseDto> ToResponseDtoList(this IEnumerable<TodoItem> entities)
+    {
+        return entities.Select(e => e.ToResponseDto());
+    }
+
+    // Apply changes of Update DTO on existing entity
+    public static void UpdateFromDto(this TodoItem entity, TodoUpdateDto dto)
+    {
+        entity.Title = dto.Title;
+        entity.IsCompleted = dto.IsCompleted;
     }
 }

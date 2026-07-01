@@ -6,6 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
 
 using Todo.DTOs;
+using Todo.Services;
+using Todo.Models;
+using Todo.Validators;
+using Todo.Data;
+using Todo.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +41,7 @@ Console.WriteLine("--- Todo REST API ---");
 // ROUTE 1: GET all todo items from MS SQL Server
 app.MapGet("/api/todo", async (ITodoService todoService) =>
 {
-    var todoItems = await todoService.GetAllTodoAsync();
+    var todoItems = await todoService.GetAllAsync();
     return Results.Ok(todoItems);
 });
 
@@ -44,20 +49,9 @@ app.MapGet("/api/todo", async (ITodoService todoService) =>
 app.MapPost("/api/todo", async (TodoCreateDto dto, ITodoService todoService) =>
 {
   // If AddTodoAsync throws an ArgumentException, the middleware catches it and returns a 400
-  var responseDto = await todoService.AddTodoAsync(dto); 
+  var responseDto = await todoService.CreateAsync(dto); 
   
   return Results.Created($"/api/todo/{responseDto.Id}", responseDto);
-});
-
-
-// ROUTE 3: PUT completed item
-app.MapPut("/api/todo/{id}/complete", async (int id, ITodoService todoService) =>
-{
-  // If the ID does not exist, CompleteTodoAsync throws a KeyNotFoundException. 
-  // The middleware catches it immediately and returns a 404! 
-  await todoService.CompleteTodoAsync(id); 
-
-  return Results.Ok(new { Message = $"Todo {id} marked as completed." });
 });
 
 // Start the API on port 5000, accessible from outside the container

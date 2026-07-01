@@ -1,16 +1,10 @@
-// File: Projects/Todo/DTOs/TodoDtos.cs
 namespace Todo.DTOs;
 
-public class TodoCreateDto
-{
-    // Le client ne fournit QUE le titre à la création.
-    public string Title { get; set; } = string.Empty;
-}
+// Creating Todo
+public record TodoCreateDto(string Title);
 
-public class TodoResponseDto
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public bool IsCompleted { get; set; }
-}
+// Update Todo
+public record TodoUpdateDto(string Title, bool IsCompleted);
 
+// Send to API cunsumer
+public record TodoResponseDto(int Id, string Title, bool IsCompleted);

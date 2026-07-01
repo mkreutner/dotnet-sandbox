@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using FluentValidation; // <-- Ajoute absolument ce using !
 
+namespace Todo.Middlewares;
+
 public class GlobalExceptionHandler : IExceptionHandler
 {
     private readonly ILogger<GlobalExceptionHandler> _logger;

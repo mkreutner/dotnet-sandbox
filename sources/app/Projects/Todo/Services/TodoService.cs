@@ -2,6 +2,9 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Todo.DTOs;
+using Todo.Data;
+
+namespace Todo.Services;
 
 public class TodoService : ITodoService
 {
@@ -17,14 +20,8 @@ public class TodoService : ITodoService
     _validator = validator;
   }
  
-  // Retrieve all Todo Items
-  public async Task<List<TodoItem>> GetAllTodoAsync()
-  {
-    return await _context.TodoItems.ToListAsync();
-  }
-
   // Add a new todo item
-  public async Task<TodoResponseDto> AddTodoAsync(TodoCreateDto dto) 
+  public async Task<TodoResponseDto> CreateAsync(TodoCreateDto dto) 
   {
     // The title validation
     var validationResult = await _validator.ValidateAsync(dto);
@@ -47,19 +44,23 @@ public class TodoService : ITodoService
     return createdDto; 
   }
 
-  // Change todo item status
-  public async Task<bool> CompleteTodoAsync(int id)
+  public async Task<IEnumerable<TodoResponseDto>> GetAllAsync()
   {
-    var item = await _context.TodoItems.FindAsync(id);
+    throw new NotImplementedException();
+  }
 
-    if (item == null)
-    {
-      throw new KeyNotFoundException("Todo item not found.");
-    }
-    
-    item.IsCompleted = true;
-    await _context.SaveChangesAsync();
-    
-    return true; 
+  public async Task<TodoResponseDto> GetByIdAsync(int id)
+  {
+    throw new NotImplementedException();
+  }
+
+  public async Task<TodoResponseDto> UpdateAsync(int id, TodoUpdateDto dto)
+  {
+    throw new NotImplementedException();
+  }
+
+  public async Task DeleteAsync(int id)
+  {
+    throw new NotImplementedException();
   }
 }
