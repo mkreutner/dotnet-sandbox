@@ -46,21 +46,47 @@ public class TodoService : ITodoService
 
   public async Task<IEnumerable<TodoResponseDto>> GetAllAsync()
   {
-    throw new NotImplementedException();
+    var items = await _context.TodoItems.ToListAsync();
+    return items.ToResponseDtoList();
   }
 
   public async Task<TodoResponseDto> GetByIdAsync(int id)
   {
-    throw new NotImplementedException();
+    var item = await _context.TodoItems.FindAsync(id);
+
+    if (item is null)
+    {
+      throw new KeyNotFoundException($"Todo item with id {id} was not found.");
+    }
+
+    return item.ToResponseDto();
   }
 
   public async Task<TodoResponseDto> UpdateAsync(int id, TodoUpdateDto dto)
   {
-    throw new NotImplementedException();
+    var item = await _context.TodoItems.FindAsync(id);
+
+    if (item is null)
+    {
+      throw new KeyNotFoundException($"Todo item with id {id} was not found.");
+    }
+
+    item.UpdateFromDto(dto);
+    await _context.SaveChangesAsync();
+
+    return item.ToResponseDto();
   }
 
   public async Task DeleteAsync(int id)
   {
-    throw new NotImplementedException();
+    var item = await _context.TodoItems.FindAsync(id);
+
+    if (item is null)
+    {
+      throw new KeyNotFoundException($"Todo item with id {id} was not found.");
+    }
+
+    _context.TodoItems.Remove(item);
+    await _context.SaveChangesAsync();
   }
 }

@@ -92,7 +92,7 @@ public async Task GetByIdAsync_ShouldReturnResponseDto_WhenTodoExists()
     var service = new TodoService(context, validator);
     
     var existingTodo = new TodoItem { Id = 10, Title = "Acheter du pain", IsCompleted = false };
-    await context.Todos.AddAsync(existingTodo);
+    await context.TodoItems.AddAsync(existingTodo);
     await context.SaveChangesAsync();
 
     // Act
@@ -125,7 +125,7 @@ public async Task UpdateAsync_ShouldModifyExistingTodo_WhenDataIsValid()
     var service = new TodoService(context, validator);
     
     var existingTodo = new TodoItem { Id = 20, Title = "Ancien Titre", IsCompleted = false };
-    await context.Todos.AddAsync(existingTodo);
+    await context.TodoItems.AddAsync(existingTodo);
     await context.SaveChangesAsync();
 
     var updateDto = new Todo.DTOs.TodoUpdateDto("Nouveau Titre", true);
@@ -147,14 +147,14 @@ public async Task DeleteAsync_ShouldRemoveTodo_WhenTodoExists()
     var service = new TodoService(context, validator);
     
     var existingTodo = new TodoItem { Id = 30, Title = "À supprimer", IsCompleted = false };
-    await context.Todos.AddAsync(existingTodo);
+    await context.TodoItems.AddAsync(existingTodo);
     await context.SaveChangesAsync();
 
     // Act
     await service.DeleteAsync(30);
 
     // Assert
-    var dbTodo = await context.Todos.FindAsync(30);
+    var dbTodo = await context.TodoItems.FindAsync(30);
     Assert.Null(dbTodo);
 }
 }
